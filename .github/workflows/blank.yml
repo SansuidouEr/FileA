@@ -1,0 +1,34 @@
+name: Sync ipv6.m3u
+
+on:
+  schedule:
+    - cron: "0 0 * * *"  # 每天 00:00 UTC 运行一次
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Download latest file
+        run: curl -o ipv6.m3u https://live.fanmingming.com/tv/m3u/ipv6.m3u
+
+      - name: Show git status
+        run: git status
+
+      - name: Show file details
+        run: cat ipv6.m3u
+
+      - name: Show git diff
+        run: git diff
+
+      - name: Commit and push changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git status --porcelain
+          git add ipv6.m3u
+          git commit -m "Auto-update ipv6.m3u on $(date)" || git commit --amend --no-edit
+          git push --force origin main
